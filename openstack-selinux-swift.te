@@ -17,73 +17,19 @@
 #
 
 #
-# Author: Miroslav Grepl 
-#
-# After building, you must run the following:
-#   restorecon -Rv /usr/bin/swift* /var/run/swift
+# Author: Lon Hohberger
 #
 
-policy_module(swift, 1.0.0)
+policy_module(openstack-selinux-swift, 1.0.0)
 
 gen_require(`
-	type rsync_t;
+	type swift_t;
 ')
-
-########################################
-#
-# Declarations
-#
-
-type swift_t;
-type swift_exec_t;
-init_daemon_domain(swift_t, swift_exec_t)
-
-type swift_var_run_t;
-files_pid_file(swift_var_run_t)
-
-type swift_data_t;
-files_type(swift_data_t)
 
 ########################################
 #
 # swift local policy
 #
-
-allow swift_t self:fifo_file rw_fifo_file_perms;
-allow swift_t self:unix_stream_socket create_stream_socket_perms;
-allow swift_t self:unix_dgram_socket create_socket_perms;
-
-manage_dirs_pattern(swift_t, swift_var_run_t, swift_var_run_t)
-manage_files_pattern(swift_t, swift_var_run_t, swift_var_run_t)
-
-# swift makes use of rsync, so we need to give rsync permissions
-# to edit swift_data_t files as well as swift_t those permissions
-manage_dirs_pattern(swift_t, swift_data_t, swift_data_t)
-manage_files_pattern(swift_t, swift_data_t, swift_data_t)
-manage_dirs_pattern(rsync_t, swift_data_t, swift_data_t)
-manage_files_pattern(rsync_t, swift_data_t, swift_data_t)
-
-manage_lnk_files_pattern(swift_t, swift_var_run_t, swift_var_run_t)
-files_pid_filetrans(swift_t, swift_var_run_t, { dir })
-
-kernel_dgram_send(swift_t)
-kernel_read_system_state(swift_t)
-
-corecmd_exec_shell(swift_t)
-
-dev_read_urand(swift_t)
-
-domain_use_interactive_fds(swift_t)
-
-files_read_etc_files(swift_t)
-
-auth_use_nsswitch(swift_t)
-
-libs_exec_ldconfig(swift_t)
-
-logging_send_syslog_msg(swift_t)
-
-miscfiles_read_localization(swift_t)
 
 # Allow swift to run unconfined
 optional_policy(`
