@@ -33,6 +33,9 @@ can_exec(neutron_t,neutron_var_lib_t)
 keepalived_domtrans(neutron_t)
 allow neutron_t self:netlink_socket { bind create getattr };
 
+# Bugzilla 1193066
+allow keepalived_t neutron_var_lib_t:file unlink;
+
 # Bugzilla 1153656
 allow neutron_t dnsmasq_t:process sigkill;
 allow haproxy_t proc_t:file read;
